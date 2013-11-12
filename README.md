@@ -21,16 +21,21 @@ Usage
 -----
 
 Create .makerc
-
 ```
 cp .makerc.sample .makerc
 ```
 Set your chef-server hostname and username, repo path, and you ready to go.
 
 Launch chef-server and your workstation setup:
-
 ```
 make install
+```
+
+Run updates: get cookbooks, upload all cookbooks, update envs/roles/nodes
+
+Destroy everything that's been generated
+```
+make destroy
 ```
 
 Check other available commands inside Makefile or just ```make help```

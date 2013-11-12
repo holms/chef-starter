@@ -66,7 +66,7 @@ server_debug:
 
 destroy:
 	-rm -rf .chef
-	-rm -rf Berksfile*
+	-rm -rf Berksfile.lock
 	-rm -rf cookbooks
 	-rm -rf data_bags
 	-rm -rf environments

@@ -8,6 +8,7 @@ Use-case
 --------
 
 Primary use-case I had, is to deploy chef-server from my own workstation with minimal fuss.
+Also this prolly would be good for initialising new chef repo and setuping workstation too.
 
 Requirements
 ------------

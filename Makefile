@@ -1,8 +1,14 @@
+
 # TODO:
 # 	* Passwordless sudo supported only
 #   * install ssh key with ssh-copy-id
 
 -include .makerc
+
+NO_COLOR=$(info -e "\x1b[0m" )
+OK_COLOR=$(info -e "\x1b[32;01m")
+ERROR_COLOR=$(info -e "\x1b[31;01m")
+WARN_COLOR=$(info -e "\x1b[33;01m")
 
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
@@ -24,7 +30,7 @@ install_init:
 
 prepare_server:
 	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
-	ssh -o StrictHostKeyChecking=no -t -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "echo '${CHEF_SERVER_USERNAME} ALL = (ALL) NOPASSWD: ALL' | sudo tee -a  /etc/sudoers "
+	ssh -o StrictHostKeyChecking=no -t -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "info '${CHEF_SERVER_USERNAME} ALL = (ALL) NOPASSWD: ALL' | sudo tee -a  /etc/sudoers "
 
 install_server:
 	cp nodes/my.cool.node.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
@@ -86,8 +92,27 @@ destroy:
 	-rm -rf site-cookbooks
 	-rm -rf tmp
 
+post_message:
+$(info 																															)
+$(info 	*******************************************************************************************************************  )
+$(info 	BUG: Knife-configure problems 																					)
+$(info	)
+$(info	There's a problem with .chef/knife.rb after knife configure -i. Knife doesn't add path of many directories so hack is	)
+$(info	)
+$(info	cookbook_path    ["cookbooks", "site-cookbooks"]																	)
+$(info	node_path        "nodes"																							)
+$(info	role_path        "roles"																						)
+$(info	environment_path "environments"																					)
+$(info	data_bag_path    "data_bags"																					)
+$(info	#encrypted_data_bag_secret "data_bag_key"																		)
+$(info	)
+$(info	knife[:berkshelf_path] = "cookbooks"																			)
+$(info																												)
+$(info	 Add this stuff to .chef/knife.rb manually, after make install failed. Then relaunch make install			)
+$(info   ******************************************************************************************************************  )
+
 help:
-	$(info          +-----------------------------------------------------------------+ )
+	$(info      +-----------------------------------------------------------------+ )
 	$(info  	|                  Chef automation utility                        | )
 	$(info  	|-----------------------------------------------------------------| )
 	$(info  	| Author: Roman Gorodeckij                                        | )

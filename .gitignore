@@ -2,7 +2,6 @@
 /cookbooks
 /tmp
 .makerc
-Berksfile
 Berksfile.lock
 data_bags/
 environments/

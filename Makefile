@@ -49,7 +49,7 @@ upload:
 	berks install
 	knife cookbook upload -a
 
-update: update_envs update_nodes update_roles
+update: upload update_envs update_nodes update_roles
 
 update_envs:
 	knife environment from file environments/*

@@ -19,6 +19,7 @@ install_init:
 	-mkdir -p .chef/keys
 
 install_server:
+	mv nodes/my.cool.hostname.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
 	knife solo prepare $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
 	knife solo cook $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
 

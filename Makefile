@@ -13,7 +13,7 @@ install_chef_server: install_server run_server
 
 install_chef:
 	sudo apt-get install ruby1.9.3 make -y
-	sudo gem install --verbose knife-solo berkshelf
+	sudo gem install --verbose --no-ri --no-rdoc knife-solo berkshelf
 
 install_init:
 	knife solo init .

@@ -1,6 +1,6 @@
-# TODO: 
+# TODO:
 # 	* Passwordless sudo supported only
-#   * install ssh key with ssh-copy-id 
+#   * install ssh key with ssh-copy-id
 
 -include .makerc
 
@@ -75,7 +75,7 @@ destroy:
 	-rm -rf nodes/*.rb
 	-rm -rf nodes/*.json
 	-rm -rf roles/*.rb
-	-rm -rf site-cookbooks 
+	-rm -rf site-cookbooks
 	-rm -rf tmp
 
 help:
@@ -90,7 +90,7 @@ help:
 	$(info  	|    make           - will do make update && make upload          | )
 	$(info  	|    make update    - will only update envs,nodes,roles           | )
 	$(info  	|    make upload    - will only upload cookbooks                  | )
-	$(info  	|    make install   - will deploy chef-server				      | )
+	$(info  	|    make install   - will deploy chef-server                     | )
 	$(info  	|    make help      - shows this box                              + )
 	$(info  	+                                                                 | )
 	$(info  	|    Don't forget to rename .makerc.sample to .makerc             | )

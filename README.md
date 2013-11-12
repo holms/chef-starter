@@ -14,7 +14,7 @@ Requirements
 ------------
 
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
-* For now ssh key is required, other options will be added later
+* You required to have private key in your ~/.ssh/ directory. It will be copied to a chef-server node
 
 * For now you have to have ```sudo``` other options will be added later. Passwordless sudo would be the best. 
   For centos users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail

@@ -35,7 +35,6 @@ Create node with your FQDN from tempalte
 
 ```
 cp my.cool.node.json.sample mydomain.com.json
-
 ```
 
 Usage

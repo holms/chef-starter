@@ -3,10 +3,11 @@
 #   * install ssh key with ssh-copy-id
 
 -include .makerc
+SSH := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 
 all: upload update
 
-install: install_base install_chef_server install_workstation
+install: destroy install_base install_chef_server install_workstation
 install_base: install_chef install_init
 install_workstation: install_base install_chef install_init install_keys install_knife
 install_chef_server: server_destroy install_server run_server
@@ -65,10 +66,17 @@ update_roles:
 	knife role from file roles/*
 
 server_destroy:
-	ssh ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME} 'sudo rm -rf /opt/chef /var/chef/ /etc/chef /etc/chef-server /root/chef-solo /root/install.sh'
+	-ssh ${SSH} "sudo chef-server-ctl uninstall"
+	-ssh ${SSH} "sudo dpkg -P chef-server"
+	-ssh ${SSH} "sudo apt-get autoremove -y"
+	-ssh ${SSH} "sudo apt-get purge -y"
+	-ssh ${SSH} "sudo pkill -f /opt/chef"
+	-ssh ${SSH} "sudo pkill -f beam"
+	-ssh ${SSH} "sudo  pkill -f postgres"
+	-ssh ${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /var/opt/chef-server/ /var/chef /var/log/chef-server/"
 
 server_debug:
-	ssh ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME} 'sudo cat /var/chef/cache/chef-stacktrace.out'
+	ssh ${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
 destroy:
 	-rm -rf .chef

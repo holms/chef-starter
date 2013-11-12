@@ -56,3 +56,8 @@ so add this stuff to .chef/knife.rb manually after ```make install``` is finishe
 
 
 
+=======
+chef-starter
+============
+
+Makefile for automating chef-server and chef-workstation setup

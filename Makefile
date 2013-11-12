@@ -61,11 +61,11 @@ upload:
 update: upload update_envs update_nodes update_roles
 
 update_envs:
-	knife environment from file environments/*
+	-knife environment from file environments/*
 update_nodes:
-	knife node from file nodes/*
+	-knife node from file nodes/*
 update_roles:
-	knife role from file roles/*
+	-knife role from file roles*/
 
 server_destroy:
 	-${SSH} "sudo chef-server-ctl uninstall"

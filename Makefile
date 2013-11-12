@@ -15,7 +15,7 @@ SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
 
 all: upload update
 
-install: destroy install_base install_chef_server install_workstation
+install: destroy install_base install_chef_server install_workstation post_message
 install_base: install_chef install_init
 install_workstation: install_base install_chef install_init install_keys install_knife
 install_chef_server: prepare_server server_destroy install_server run_server

@@ -2,6 +2,7 @@ Chef-Starter
 ============
 
 This is PRE-ALPHA! For testing only!
+Please fork and help a project, if you can do better makefile scripting, or found something to fix.
 
 Use-case
 --------

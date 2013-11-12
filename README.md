@@ -17,8 +17,8 @@ Requirements
 * For now you have to have ```sudo``` other options will be added later. Passwordless sudo would be the best
 * For now ssh key is required, other options will be added later
 
-Usage
------
+Configure
+---------
 
 Create .makerc
 ```
@@ -30,6 +30,17 @@ Launch chef-server and your workstation setup:
 ```
 make install
 ```
+
+Create node with your FQDN from tempalte
+
+```
+cp my.cool.node.json.sample mydomain.com.json
+
+```
+
+Usage
+-----
+
 
 Run updates: get cookbooks, upload all cookbooks, update envs/roles/nodes
 ```

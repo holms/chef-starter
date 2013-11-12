@@ -12,7 +12,7 @@ install_workstation: install_base install_chef install_init install_keys install
 install_chef_server: install_server run_server
 
 install_chef:
-	sudo apt-get install ruby1.9.3
+	sudo apt-get install ruby1.9.3 make -y
 	sudo gem install knife-solo berkshelf
 
 install_init:

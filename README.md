@@ -15,9 +15,7 @@ Requirements
 
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
 * You required to have private key in your ~/.ssh/ directory. It will be copied to a chef-server node
-
-* For now you have to have ```sudo``` other options will be added later. Passwordless sudo would be the best. 
-  For centos users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
+* SUDO enabled linux. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
 
 Configure
 ---------
@@ -28,8 +26,10 @@ cp .makerc.sample .makerc
 ```
 Set your chef-server hostname and username, repo path, and you ready to go.
 
-Launch chef-server and your workstation setup:
+
+This will setup chef-server and workstation
 ```
+# make server_prepare # if you want copy ssh key 
 make install
 ```
 
@@ -52,7 +52,11 @@ Check other available commands inside Makefile or just ```make help```
 BUG: Knife-configure problems
 -----------------------------
 
-There's a problem with .chef/knife.rb after knife configure -i. Knife doesn't add path of many directories so hack is
+If you want to use knife-solo together with knife, you need to append knife-solo generated config to knife.rb
+There's a problem with .chef/knife.rb after knife configure -i. Knife by default thinks that everything in */var/chef*
+So if you'll decided to use knife-solo after ```make install``` will finish, it will crash, saying there's no roles in */var/chef/role*s.
+
+Add this stuff to .chef/knife.rb manually
 
 ```
 cookbook_path    ["cookbooks", "site-cookbooks"]
@@ -65,8 +69,7 @@ data_bag_path    "data_bags"
 knife[:berkshelf_path] = "cookbooks"
 
 ```
+TODO: Find how to force knife configure append configuration, instead of overwriting it.
 
-Add this stuff to .chef/knife.rb manually, after ```make install``` failed.
-Then relaunch ```make install```
 
 

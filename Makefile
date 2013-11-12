@@ -10,7 +10,7 @@ all: upload update
 install: destroy install_base install_chef_server install_workstation
 install_base: install_chef install_init
 install_workstation: install_base install_chef install_init install_keys install_knife
-install_chef_server: server_destroy install_server run_server
+install_chef_server: prepare_server server_destroy install_server run_server
 
 install_chef:
 	sudo apt-get install ruby1.9.3 make -y

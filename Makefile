@@ -9,7 +9,7 @@ all: upload update
 install: install_base install_chef_server install_workstation
 install_base: install_chef install_init
 install_workstation: install_base install_chef install_init install_keys install_knife
-install_chef_server: install_server run_server
+install_chef_server: server_destroy install_server run_server
 
 install_chef:
 	sudo apt-get install ruby1.9.3 make -y
@@ -19,8 +19,11 @@ install_init:
 	knife solo init .
 	-mkdir -p .chef/keys
 
-install_server:
+prepare_server:
 	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
+	#ssh -o StrictHostKeyChecking=no -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "echo '${CHEF_SERVER_USERNAME} ALL = (ALL) NOPASSWD: ALL' | sudo tee -a  /etc/sudoers "
+
+install_server:
 	cp nodes/my.cool.node.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
 	knife solo prepare $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
 	knife solo cook $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)

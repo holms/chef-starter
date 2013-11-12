@@ -70,7 +70,7 @@ knife[:berkshelf_path] = "cookbooks"
 
 ```
 
-so add this stuff to .chef/knife.rb manually after ```make install``` is finished.
-
+Add this stuff to .chef/knife.rb manually, ```make install``` failed.
+And relaunch ```make install```
 
 

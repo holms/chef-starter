@@ -3,7 +3,9 @@
 #   * install ssh key with ssh-copy-id
 
 -include .makerc
-SSH := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
+
+SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
+SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
 
 all: upload update
 
@@ -30,17 +32,11 @@ install_server:
 	knife solo cook $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
 
 run_server:
-ifneq (`echo $(chef_server_username)`,root)
-			ssh -o StrictHostKeyChecking=no -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "sudo chef-server-ctl start"
-else
-			ssh -o StrictHostKeyChecking=no -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "chef-server-ctl start"
-endif
+	${SSH} "sudo chef-server-ctl start"
 
 install_keys:
-ifneq (`echo $(CHEF_SERVER_USERNAME)`,root)
-	ssh -o StrictHostKeyChecking=no -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "sudo chown -R ${CHEF_SERVER_USERNAME} /etc/chef-server/*.pem"
-endif
-	scp ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}:/etc/chef-server/*.pem .chef/keys/
+	${SSH} "sudo chown -R ${CHEF_SERVER_USERNAME} /etc/chef-server/*.pem"
+	scp ${SSH_CREDS}:/etc/chef-server/*.pem .chef/keys/
 
 install_knife:
 	knife configure -i --admin-client-key=./.chef/keys/admin.pem \
@@ -66,17 +62,17 @@ update_roles:
 	knife role from file roles/*
 
 server_destroy:
-	-ssh ${SSH} "sudo chef-server-ctl uninstall"
-	-ssh ${SSH} "sudo dpkg -P chef-server"
-	-ssh ${SSH} "sudo apt-get autoremove -y"
-	-ssh ${SSH} "sudo apt-get purge -y"
-	-ssh ${SSH} "sudo pkill -f /opt/chef"
-	-ssh ${SSH} "sudo pkill -f beam"
-	-ssh ${SSH} "sudo  pkill -f postgres"
-	-ssh ${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /var/opt/chef-server/ /var/chef /var/log/chef-server/"
+	-${SSH} "sudo chef-server-ctl uninstall"
+	-${SSH} "sudo dpkg -P chef-server"
+	-${SSH} "sudo apt-get autoremove -y"
+	-${SSH} "sudo apt-get purge -y"
+	-${SSH} "sudo pkill -f /opt/chef"
+	-${SSH} "sudo pkill -f beam"
+	-${SSH} "sudo  pkill -f postgres"
+	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /var/opt/chef-server/ /var/chef /var/log/chef-server/"
 
 server_debug:
-	ssh ${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
+	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
 destroy:
 	-rm -rf .chef

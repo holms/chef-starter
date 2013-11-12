@@ -14,7 +14,7 @@ Requirements
 ------------
 
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
-* For now you have to have ```sudo``` other options will be added later
+* For now you have to have ```sudo``` other options will be added later. Passwordless sudo would be the best
 * For now ssh key is required, other options will be added later
 
 Usage

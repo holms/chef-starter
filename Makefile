@@ -73,7 +73,6 @@ destroy:
 	-rm -rf nodes/*.json
 	-rm -rf nodes/*.rb
 	-rm -rf nodes/*.json
-	-rm -rf roles/*.rb
 	-rm -rf site-cookbooks
 	-rm -rf tmp
 

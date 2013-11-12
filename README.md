@@ -14,7 +14,7 @@ Requirements
 ------------
 
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
-* You required to have private key in your ~/.ssh/ directory. It will be copied to a chef-server node
+* You required to have public key in your ~/.ssh/ directory. It will be copied to a chef-server node.
 * SUDO enabled linux. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
 
 Configure
@@ -29,7 +29,6 @@ Set your chef-server hostname and username, repo path, and you ready to go.
 
 This will setup chef-server and workstation
 ```
-# make server_prepare # if you want copy ssh key 
 make install
 ```
 

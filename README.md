@@ -17,7 +17,7 @@ Requirements
 * For now ssh key is required, other options will be added later
 
 * For now you have to have ```sudo``` other options will be added later. Passwordless sudo would be the best. 
-  For centos users: Don't forget to comment out #Default requiretty if you're on Centos
+  For centos users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
 
 Configure
 ---------

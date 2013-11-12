@@ -32,6 +32,9 @@ make install
 ```
 
 Run updates: get cookbooks, upload all cookbooks, update envs/roles/nodes
+```
+make update
+```
 
 Destroy everything that's been generated
 ```

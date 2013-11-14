@@ -10,4 +10,5 @@ site-cookbooks/
 roles/
 nodes/
 .chef
-
+client.rb
+*.pem

@@ -27,7 +27,7 @@ install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
 	knife solo init .
 	-mkdir -p .chef/keys
-	cp Berksfiles.sample Berksfile
+	cp Berksfile.sample Berksfile
 
 prepare_server:
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
@@ -56,7 +56,7 @@ install_knife:
 	@-echo -e "\n\e[31m Configuring workstation ...\e[39m\n"
 	knife configure -i --admin-client-key=./.chef/keys/admin.pem \
 					   --admin-client-name=admin \
-					   --server-url "https://${CHEF_SERVER_HOSTNAME}:443" \
+					   --server-url "https://${CHEF_SERVER_HOSTNAME}" \
 					   --editor vim \
 					   --repository ${CHEF_REPO_PATH} \
 					   --user=${CHEF_NODE_USERNAME} \
@@ -76,9 +76,10 @@ update: upload update_envs update_nodes update_roles
 update_envs:
 	-knife environment from file environments/*
 update_nodes:
-	-knife node from file nodes/*
+	-knife node from file nodes/*.json
 update_roles:
-	-knife role from file roles*/
+	-knife role from file roles/*.rb
+	-knife role from file roles/*.json
 
 server_destroy:
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"
@@ -126,12 +127,12 @@ post_message:
 	$(info	 Add this stuff to .chef/knife.rb manually, after make install failed. Then relaunch make install			)
 	$(info  ******************************************************************************************************************  )
 
-nodes := $(filter-out $(wildcard nodes/*$(CHEF_SERVER_HOSTNAME)* nodes/*.sample* nodes/*.json*  ),$(wildcard nodes/* ))
+nodes := $(filter-out $(wildcard nodes/*$(CHEF_SERVER_HOSTNAME)* nodes/*.sample*   ),$(wildcard nodes/* ))
 nodes := $(patsubst nodes/%.json,node_%,$(nodes))
 
 .PHONY: cook
 cook : $(nodes)
-node_% : # TODO: passwordless sudo
+node_%:
 	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client run"
 
 .PHONY: node_create
@@ -146,11 +147,12 @@ node_create:
 	echo -e "\n\e[31mAdding $$node_fqdn to chef server ...\n\e[39m"; \
 	knife node from file nodes/$$node_fqdn.json ; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
+	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	scp -r .chef/validation.pem $$node_fqdn:~/ ; \
 	scp -r .chef/client.rb $$node_fqdn:~/ ; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
-	knife solo prepare logstash.holms.lt
+	knife bootstrap $$node_fqdn
 
 help:
 	$(info      +-----------------------------------------------------------------+ )

@@ -42,6 +42,11 @@ Run updates: get cookbooks, upload all cookbooks, update envs/roles/nodes
 make update
 ```
 
+Create and bootstrap a node
+```
+make node_create
+```
+
 Destroy everything that's been generated
 ```
 make destroy

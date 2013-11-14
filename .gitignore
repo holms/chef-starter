@@ -12,3 +12,4 @@ nodes/
 .chef
 client.rb
 *.pem
+Berksfile

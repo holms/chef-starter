@@ -63,6 +63,10 @@ Check other available commands inside Makefile or just ```make help```
 BUG: Knife-configure problems
 -----------------------------
 
+Update: not sure about this method anymore. When I set all the paths, using ```knife bootstrap```, it stops seeing
+        his keys, and chef-client crashses. So don't perform this step if you want to have working knife after server 
+        installation
+
 If you want to use knife-solo together with knife, you need to append knife-solo generated config to knife.rb
 There's a problem with .chef/knife.rb after knife configure -i. Knife by default thinks that everything in */var/chef*
 So if you'll decided to use knife-solo after ```make install``` will finish, it will crash, saying there's no roles in */var/chef/role*s.

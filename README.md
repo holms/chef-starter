@@ -47,6 +47,12 @@ Create and bootstrap a node
 make node_create
 ```
 
+Cook all nodes
+
+```
+make cook
+```
+
 Destroy everything that's been generated
 ```
 make destroy

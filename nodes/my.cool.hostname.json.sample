@@ -1,5 +1,5 @@
 {
-  "name": "holms.lt",
+  "name": "",
   "chef_environment": "_default",
   "json_class": "Chef::Node",
   "automatic": {

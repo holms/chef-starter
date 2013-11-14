@@ -27,6 +27,7 @@ install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
 	knife solo init .
 	-mkdir -p .chef/keys
+	cp Berksfiles.sample Berksfile
 
 prepare_server:
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
@@ -149,7 +150,7 @@ node_create:
 	scp -r .chef/client.rb $$node_fqdn:~/ ; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
-	knife bootstrap -x ${CHEF_NODE_USERNAME} --sudo $$node_fqdn
+	knife solo prepare logstash.holms.lt
 
 help:
 	$(info      +-----------------------------------------------------------------+ )

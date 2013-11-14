@@ -67,7 +67,7 @@ install_knife:
 
 upload:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
-	berks install
+	berks install --path ./cookbooks
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife cookbook upload -a
 

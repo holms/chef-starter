@@ -103,8 +103,6 @@ destroy:
 	-rm -rf cookbooks
 	-rm -rf data_bags
 	-rm -rf environments
-	-rm -rf nodes/*.json
-	-rm -rf nodes/*.rb
 	-rm -rf site-cookbooks
 	-rm -rf tmp
 

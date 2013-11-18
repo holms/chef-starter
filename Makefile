@@ -65,21 +65,11 @@ install_knife:
 					   --print-after -y
 	knife configure client .chef/
 
-upload:
+update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	berks install --path ./cookbooks
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
-	knife cookbook upload -a
-
-update: upload update_envs update_nodes update_roles
-
-update_envs:
-	-knife environment from file environments/*
-update_nodes:
-	-knife node from file nodes/*.json
-update_roles:
-	-knife role from file roles/*.rb
-	-knife role from file roles/*.json
+	knife upload --chef-repo-path=${CHEF_REPO_PATH} /
 
 server_destroy:
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"

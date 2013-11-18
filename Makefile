@@ -133,7 +133,7 @@ node_create:
 	scp -r .chef/client.rb $$node_fqdn:~/ ; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
-	knife bootstrap $$node_fqdn
+	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 
 help:
 	$(info      +-----------------------------------------------------------------+ )

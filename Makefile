@@ -119,9 +119,9 @@ node_create:
 	knife node from file nodes/$$node_fqdn.json ; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
-	scp -r .chef/validation.pem $$node_fqdn:~/ ; \
-	scp -r .chef/client.rb $$node_fqdn:~/ ; \
-	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
+	#scp -r .chef/validation.pem $$node_fqdn:~/ ; \
+	#scp -r .chef/client.rb $$node_fqdn:~/ ; \
+	#ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 

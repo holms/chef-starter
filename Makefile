@@ -120,7 +120,7 @@ node_create:
 	echo -e "\n\e[31mCopying your public keys to node ...\n\e[39m"; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn ; \
 	echo -e "\n\e[31mAdding $$node_fqdn to chef server ...\n\e[39m"; \
-	knife node from file nodes/$$node_fqdn.json ; \
+	knife upload nodes/$$node_fqdn.json ; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	#scp -r .chef/validation.pem $$node_fqdn:~/ ; \

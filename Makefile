@@ -69,10 +69,10 @@ update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	berks install --path ./cookbooks
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
-	knife upload cookbooks
-	knife upload environments
-	knife upload nodes
-	knife upload roles
+	knife upload cookbooks /cookbooks
+	knife upload environments /environments/*.json
+	knife upload nodes /nodes/*.json
+	knife upload roles /roles/*.json
 
 
 server_destroy:
@@ -120,7 +120,8 @@ node_create:
 	echo -e "\n\e[31mCopying your public keys to node ...\n\e[39m"; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn ; \
 	echo -e "\n\e[31mAdding $$node_fqdn to chef server ...\n\e[39m"; \
-	knife upload nodes/$$node_fqdn.json ; \
+	knife upload /nodes/$$node_fqdn.json ; \
+	knife node from file nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	#scp -r .chef/validation.pem $$node_fqdn:~/ ; \

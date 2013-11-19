@@ -27,7 +27,10 @@ install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
 	knife solo init .
 	-mkdir -p .chef/keys
-	cp Berksfile.sample Berksfile
+	@-if [ ! -f Berksfile ] ; \
+	then \
+	   cp Berksfile.sample Berksfile; \
+	fi;
 
 prepare_server:
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"

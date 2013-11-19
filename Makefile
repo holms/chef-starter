@@ -90,7 +90,7 @@ server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
 destroy:
-	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY ALL YOUR NODES ANR ROLES, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
+	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER AND YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
 	@-echo -e "Press enter to confirm: "; read confirm
 	-rm -rf .chef
 	-rm -rf Berksfile.lock
@@ -124,14 +124,11 @@ node_create:
 	knife node from file nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
-	#scp -r .chef/validation.pem $$node_fqdn:~/ ; \
-	#scp -r .chef/client.rb $$node_fqdn:~/ ; \
-	#ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo mkdir -p /etc/chef && sudo mv ~/client.rb ~/validation.pem /etc/chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 
 help:
-	$(info      +-----------------------------------------------------------------+ )
+	$(info		+-----------------------------------------------------------------+ )
 	$(info  	|                  Chef automation utility                        | )
 	$(info  	|-----------------------------------------------------------------| )
 	$(info  	| Author: Roman Gorodeckij                                        | )

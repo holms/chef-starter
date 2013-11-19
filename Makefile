@@ -136,7 +136,7 @@ rebootstrap:
 	echo -e "\n\e[31mRemoving chef-client from  $$node_fqdn.json ...\e[39m"; \
 	knife node delete $$node_fqdn; \
 	knife client delete $$node_fqdn; \
-	ssh $$node_fqdn  "sudo rm -rf /etc/chef"; \
+	ssh $$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 	@-echo -e "\n\e[33mWarning: Don't forget to run 'make update', because this node was cleared out \n\e[39m\n"

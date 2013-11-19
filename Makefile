@@ -127,6 +127,21 @@ node_create:
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 
+rebootstrap:
+	@-echo -e "\n\e[31mHere's a list of your nodes: "
+	@-echo -e "\e[33m "
+	@-knife node list
+	@-echo -e "\e[39m "
+	@-echo "New node FQDN: "; read node_fqdn; \
+	echo -e "\n\e[31mRemoving chef-client from  $$node_fqdn.json ...\e[39m"; \
+	knife node delete $$node_fqdn; \
+	knife client delete $$node_fqdn; \
+	ssh $$node_fqdn  "sudo rm -rf /etc/chef"; \
+	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
+	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
+	@-echo -e "\n\e[33mWarning: Don't forget to run 'make update', because this node was cleared out \n\e[39m\n"
+
+
 help:
 	$(info		+-----------------------------------------------------------------+ )
 	$(info  	|                  Chef automation utility                        | )

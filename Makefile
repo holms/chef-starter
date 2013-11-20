@@ -152,9 +152,9 @@ rebootstrap:
 	ssh-copy-id $$node_fqdn; \
 	ssh $$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
-	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
-	@-echo -e "\n\e[33mWarning: Don't forget to run 'make update', because this node was cleared out \n\e[39m\n"
-
+	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
+	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \
+	knife upload /nodes/$$node_fqdn.json 
 
 help:
 	$(info		+-----------------------------------------------------------------+ )

@@ -53,6 +53,12 @@ Cook all nodes
 make cook
 ```
 
+Cook specified node, you will be asked to enter node name, and node list will be shown
+```
+make node_cook
+```
+
+
 Destroy everything that's been generated
 ```
 make destroy

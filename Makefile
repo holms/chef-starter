@@ -10,7 +10,7 @@ SHELL 		:= /bin/bash
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
 
-all: upload update
+all: update
 
 install: destroy install_base install_chef_server install_workstation post_message
 install_base: install_chef install_init

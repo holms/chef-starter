@@ -39,7 +39,7 @@ Usage
 
 Run updates: get cookbooks, upload all cookbooks, update envs/roles/nodes
 ```
-make update
+make # or make update
 ```
 
 Create and bootstrap a node
@@ -52,6 +52,12 @@ Cook all nodes
 ```
 make cook
 ```
+
+Cook specified node, you will be asked to enter node name, and node list will be shown
+```
+make node_cook
+```
+
 
 Destroy everything that's been generated
 ```

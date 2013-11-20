@@ -10,7 +10,7 @@ SHELL 		:= /bin/bash
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
 
-all: upload update
+all: update
 
 install: destroy install_base install_chef_server install_workstation post_message
 install_base: install_chef install_init
@@ -70,6 +70,7 @@ install_knife:
 
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
+	-rm -rf Berksfile.lock
 	berks install --path ./cookbooks
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife upload cookbooks /cookbooks
@@ -112,6 +113,15 @@ nodes := $(patsubst nodes/%.json,node_%,$(nodes))
 cook : $(nodes)
 node_%:
 	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client run"
+
+.PHONY: node_cook
+node_cook:
+	@-echo -e "\n\e[31mHere's a list of your nodes: "
+	@-echo -e "\e[33m "
+	@-knife node list
+	@-echo -e "\e[39m"
+	@-echo "New node FQDN: "; read node_fqdn; \
+	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
 
 .PHONY: node_create
 node_create:

@@ -37,12 +37,12 @@ endif
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
-	knife solo init .
-	-mkdir -p .chef/keys
 	@-if [ ! -f Berksfile ] ; \
 	then \
 	   cp Berksfile.sample Berksfile; \
 	fi;
+	knife solo init .
+	-mkdir -p .chef/keys
 
 prepare_server:
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
@@ -102,7 +102,7 @@ server_destroy:
 	-${SSH} "sudo apt-get purge -y"
 	-${SSH} "sudo pkill -f /opt/chef"
 	-${SSH} "sudo pkill -f beam"
-	-${SSH} "sudo  pkill -f postgres"
+	-${SSH} "sudo pkill -f postgres"
 	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /var/opt/chef-server/ /var/chef /var/log/chef-server/"
 
 server_debug:

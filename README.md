@@ -18,6 +18,11 @@ Requirements
 * SUDO enabled linux. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
 * You sudo user must be the same on all the nodes as server machine (propose for better practise in issue)
 
+OSX support:
+------------
+    * Install macports
+    * Install bash
+
 Configure
 ---------
 

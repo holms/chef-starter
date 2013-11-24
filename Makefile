@@ -47,8 +47,10 @@ install_init:
 prepare_server:
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
 	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
+ifneq ($(CHEF_SERVER_USERNAME),root)
 	@-echo -e "\n\e[31m Adding chef-server username to passwordless sudoers ...\e[39m\n"
 	ssh -o StrictHostKeyChecking=no -t -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "echo '${CHEF_SERVER_USERNAME} ALL = (ALL) NOPASSWD: ALL' | sudo tee -a  /etc/sudoers "
+endif
 
 install_server:
 	@-echo -e "\n\e[31m Copying chef-server node template as node config ...\e[39m\n"

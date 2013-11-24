@@ -4,11 +4,16 @@
 #   * install ssh key with ssh-copy-id
 
 -include .makerc
+UNAME := $(shell uname)
 
-SHELL 		:= /bin/bash
+ifeq ($(UNAME),Darwin)
+	SHELL := /opt/local/bin/bash
+else
+	SHELL := /bin/bash
+endif
 
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
-SSH	  := ssh -o StrictHostKeyChecking=no ${SSH_CREDS}
+SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
 
 all: update
 
@@ -19,7 +24,14 @@ install_chef_server: server_destroy prepare_server install_server run_server
 
 install_chef:
 	@-echo -e "\n\e[31m Installing ruby and make packages ...\e[39m\n"
-	sudo apt-get install ruby1.9.3 make -y
+ifeq ($(UNAME),Darwin)
+		sudo port -v install ruby19 +nosuffiix
+		sudo port -v install gmake
+		sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
+		sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
+else
+		sudo apt-get install ruby1.9.3 make -y
+endif
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
 	sudo gem install --verbose --no-ri --no-rdoc knife-solo berkshelf
 

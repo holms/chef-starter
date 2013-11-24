@@ -97,13 +97,16 @@ update:
 server_destroy:
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"
 	-${SSH} "sudo chef-server-ctl uninstall"
-	-${SSH} "sudo dpkg -P chef-server"
-	-${SSH} "sudo apt-get autoremove -y"
-	-${SSH} "sudo apt-get purge -y"
+ifeq ($(CHEF_SERVER_OS),debian)
+	-${SSH} "sudo dpkg -P chef-server; sudo apt-get autoremove -y; sudo apt-get purge -y"
+endif
+ifeq ($(CHEF_SERVER_OS),redhat)
+	-${SSH} "sudo rpm -ev \`rpm -q chef\`"
+endif
 	-${SSH} "sudo pkill -f /opt/chef"
 	-${SSH} "sudo pkill -f beam"
 	-${SSH} "sudo pkill -f postgres"
-	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /var/opt/chef-server/ /var/chef /var/log/chef-server/"
+	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /root/chef-solo /usr/bin/chef* /var/opt/chef-server/ /var/chef /var/log/chef-server/ /tmp/hsperfdata_chef_server"
 
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
@@ -165,7 +168,7 @@ rebootstrap:
 	knife node delete $$node_fqdn; \
 	knife client delete $$node_fqdn; \
 	ssh-copy-id $$node_fqdn; \
-	ssh $$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
+	${SSH} $$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \

@@ -154,7 +154,7 @@ node_create:
 	knife upload /nodes/$$node_fqdn.json ; \
 	knife node from file nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
-	ssh ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
+	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
 
@@ -167,8 +167,8 @@ rebootstrap:
 	echo -e "\n\e[31mRemoving chef-client from  $$node_fqdn.json ...\e[39m"; \
 	knife node delete $$node_fqdn; \
 	knife client delete $$node_fqdn; \
-	ssh-copy-id $$node_fqdn; \
-	${SSH} $$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
+	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn; \
+	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \

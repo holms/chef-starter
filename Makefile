@@ -156,7 +156,8 @@ node_create:
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
-	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo
+	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo; \
+	knife upload /nodes/$$node_fqdn.json
 
 rebootstrap:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "

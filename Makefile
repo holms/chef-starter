@@ -128,12 +128,12 @@ nodes := $(filter-out $(wildcard nodes/*$(CHEF_SERVER_HOSTNAME)* nodes/*.sample*
 nodes := $(patsubst nodes/%.json,node_%,$(nodes))
 
 .PHONY: cook
-cook : $(nodes)
+cook-all : $(nodes)
 node_%:
 	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client run"
 
 .PHONY: node_cook
-node_cook:
+cook:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "
 	@-echo -e "\e[33m "
 	@-knife node list

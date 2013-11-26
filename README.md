@@ -16,7 +16,7 @@ Requirements
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
 * You required to have public key in your ~/.ssh/ directory. It will be copied to a chef-server node.
 * SUDO enabled linux. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
-* You sudo user must be the same on all the nodes as server machine (propose for better practise in issue)
+* Your sudo user must be the same on all the nodes as server machine (propose for better practise in issue)
 
 OSX support:
 ------------
@@ -52,15 +52,15 @@ Create and bootstrap a node
 make node_create
 ```
 
-Cook all nodes
+Cook all nodes (not recommended, usually nodes should go in order)
 
 ```
-make cook
+make cook-all
 ```
 
 Cook specified node, you will be asked to enter node name, and node list will be shown
 ```
-make node_cook
+make node
 ```
 
 

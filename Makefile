@@ -139,7 +139,7 @@ cook:
 	@-echo -e "\e[33m "
 	@-knife node list
 	@-echo -e "\e[39m"
-	@-echo "New node FQDN: "; read node_fqdn; \
+	@-echo "Node FQDN: "; read node_fqdn; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
 
 .PHONY: node_create

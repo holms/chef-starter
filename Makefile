@@ -143,7 +143,7 @@ cook:
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
 
 .PHONY: node_create
-node_create:
+node:
 	@-echo "New node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mCopying node template to $$node_fqdn.json ...\e[39m"; \
 	cp nodes/my.cool.hostname.json.sample nodes/$$node_fqdn.json; \

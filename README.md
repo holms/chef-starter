@@ -49,7 +49,7 @@ make # or make update
 
 Create and bootstrap a node
 ```
-make node_create
+make node
 ```
 
 Cook all nodes (not recommended, usually nodes should go in order)
@@ -60,7 +60,7 @@ make cook-all
 
 Cook specified node, you will be asked to enter node name, and node list will be shown
 ```
-make node
+make cook
 ```
 
 

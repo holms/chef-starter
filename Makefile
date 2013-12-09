@@ -17,10 +17,14 @@ SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
 
 all: update
 
-install: destroy install_base install_chef_server install_workstation post_message
+install: install_ssh_key destroy install_base install_chef_server install_workstation post_message
 install_base: install_chef install_init
 install_workstation: install_base install_chef install_init install_keys install_knife
-install_chef_server: server_destroy prepare_server install_server run_server
+install_chef_server: install_ssh_key server_destroy prepare_server install_server run_server
+
+install_ssh_key:
+	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
+	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 
 install_chef:
 	@-echo -e "\n\e[31m Installing ruby and make packages ...\e[39m\n"
@@ -46,8 +50,6 @@ install_init:
 	-mkdir -p .chef/keys
 
 prepare_server:
-	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
-	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 ifneq ($(CHEF_SERVER_USERNAME),root)
 	@-echo -e "\n\e[31m Adding chef-server username to passwordless sudoers ...\e[39m\n"
 	ssh -o StrictHostKeyChecking=no -t -l ${CHEF_SERVER_USERNAME} ${CHEF_SERVER_HOSTNAME} "echo '${CHEF_SERVER_USERNAME} ALL = (ALL) NOPASSWD: ALL' | sudo tee -a  /etc/sudoers "

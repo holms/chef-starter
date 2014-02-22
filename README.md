@@ -21,7 +21,7 @@ Requirements
 OSX support:
 ------------
     * Install macports
-    * Install bash
+    * Install bash via macports
 
 Configure
 ---------
@@ -36,6 +36,11 @@ Set your chef-server hostname and username, repo path, and you ready to go.
 This will setup chef-server and workstation
 ```
 make install
+```
+
+This will only install chef-solo
+```
+make install_solo
 ```
 
 Usage

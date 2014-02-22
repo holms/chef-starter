@@ -1,7 +1,6 @@
 
 # TODO:
 # 	* Passwordless sudo supported only
-#   * install ssh key with ssh-copy-id
 
 -include .makerc
 UNAME := $(shell uname)
@@ -18,8 +17,8 @@ SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
 all: update
 
 install: install_ssh_key destroy install_base install_chef_server install_workstation post_message
-install_base: install_chef install_init
-install_workstation: install_base install_chef install_init install_keys install_knife
+install_solo: install_chef install_init install_solo install_chef install_init
+install_workstation: install_keys install_knife
 install_chef_server: install_ssh_key server_destroy prepare_server install_server run_server
 
 install_ssh_key:
@@ -31,7 +30,7 @@ install_chef:
 ifeq ($(UNAME),Darwin)
 		sudo port -v install ruby19 +nosuffiix
 		sudo port -v install gmake
-		sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
+		-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
 		sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
 else
 		sudo apt-get install ruby1.9.3 make -y
@@ -130,12 +129,12 @@ post_message:
 nodes := $(filter-out $(wildcard nodes/*$(CHEF_SERVER_HOSTNAME)* nodes/*.sample*   ),$(wildcard nodes/* ))
 nodes := $(patsubst nodes/%.json,node_%,$(nodes))
 
-.PHONY: cook
+.PHONY: cook-all
 cook-all : $(nodes)
 node_%:
 	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client run"
 
-.PHONY: node_cook
+.PHONY: cook
 cook:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "
 	@-echo -e "\e[33m "
@@ -144,7 +143,7 @@ cook:
 	@-echo "Node FQDN: "; read node_fqdn; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
 
-.PHONY: node_create
+.PHONY: node
 node:
 	@-echo "New node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mCopying node template to $$node_fqdn.json ...\e[39m"; \
@@ -176,7 +175,7 @@ rebootstrap:
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
 	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \
-	knife upload /nodes/$$node_fqdn.json 
+	knife upload /nodes/$$node_fqdn.json
 
 help:
 	$(info		+-----------------------------------------------------------------+ )

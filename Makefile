@@ -102,7 +102,7 @@ server_destroy:
 ifeq ($(CHEF_SERVER_OS),debian)
 	-${SSH} "sudo dpkg -P chef-server; sudo apt-get autoremove -y; sudo apt-get purge -y"
 endif
-ifeq ($(CHEF_SERVER_OS),redhat)
+ifeq ($(CHEF_SERVER_OS),rhel)
 	-${SSH} "sudo rpm -ev \`rpm -q chef\`"
 endif
 	-${SSH} "sudo pkill -f /opt/chef"

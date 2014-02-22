@@ -52,10 +52,11 @@ Create and bootstrap a node
 make node
 ```
 
-Cook all nodes (not recommended, usually nodes should go in order)
 
+
+Rebootstrap node
 ```
-make cook-all
+make rebootstrap
 ```
 
 Cook specified node, you will be asked to enter node name, and node list will be shown
@@ -67,6 +68,11 @@ make cook
 Destroy everything that's been generated
 ```
 make destroy
+```
+
+Remove chef installation on server (BUG: doesn't work with RHEL)
+```
+make server_destroy
 ```
 
 Check other available commands inside Makefile or just ```make help```

@@ -88,13 +88,14 @@ update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	-rm -rf Berksfile.lock
 	berks install --path ./cookbooks
+ifdef $(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife upload cookbooks /cookbooks
 	knife upload environments /environments/*.json
 	@-echo -e "\n\e[33m **** Nodes update depricated and it destroys node state, other cookbook may fail because of this  *****\e[39m\n"
 	#knife upload nodes /nodes/*.json
 	knife upload roles /roles/*.json
-
+endif
 
 server_destroy:
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"

@@ -178,25 +178,3 @@ rebootstrap:
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \
 	knife upload /nodes/$$node_fqdn.json
 
-help:
-	$(info		+-----------------------------------------------------------------+ )
-	$(info  	|                  Chef automation utility                        | )
-	$(info  	|-----------------------------------------------------------------| )
-	$(info  	| Author: Roman Gorodeckij                                        | )
-	$(info  	| Email:  Roman_Gorodeckij@dell.com                               | )
-	$(info  	|                                                                 | )
-	$(info  	| All available commands:                                         | )
-	$(info  	|                                                                 | )
-	$(info  	|    make           - will do make update && make upload          | )
-	$(info  	|    make update    - will only update envs,nodes,roles           | )
-	$(info  	|    make upload    - will only upload cookbooks                  | )
-	$(info  	|    make install   - will deploy chef-server                     | )
-	$(info  	|    make help      - shows this box                              + )
-	$(info  	+                                                                 | )
-	$(info  	|    Don't forget to rename .makerc.sample to .makerc             | )
-	$(info  	|    Edit .makerc to set your chef-server hostname and username   | )
-	$(info  	|    For now only ssh keys authorization supported.               | )
-	$(info  	|                                                                 | )
-	$(info  	|                                                                 | )
-	$(info  	|                                                                 | )
-	$(info  	+-----------------------------------------------------------------+ )

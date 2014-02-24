@@ -8,7 +8,9 @@ environments/
 cookbooks/
 site-cookbooks/
 roles/
+roles
 nodes/
+nodes
 .chef
 client.rb
 *.pem

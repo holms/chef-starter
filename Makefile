@@ -56,7 +56,8 @@ endif
 
 install_server:
 	@-echo -e "\n\e[31m Copying chef-server node template as node config ...\e[39m\n"
-	cp nodes/chef.server.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
+	mkdir nodes
+	ln -s .nodes/chef.server.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
 	@-echo -e "\n\e[31m Bootstraping chef-server ...\e[39m\n"
 	knife solo prepare $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Cooking chef-server ...\e[39m\n"

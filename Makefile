@@ -36,8 +36,8 @@ else
 		sudo apt-get install ruby1.9.3 make -y
 endif
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
-	sudo gem install --verbose --no-ri --no-rdoc knife-solo berkshelf
-	sudo gem update --verbose --no-ri --no-rdoc knife-solo berkshelf
+	sudo gem install --no-ri --no-rdoc knife-solo berkshelf
+	sudo gem update --no-ri --no-rdoc knife-solo berkshelf
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"

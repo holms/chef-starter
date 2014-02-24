@@ -17,7 +17,7 @@ SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
 all: update
 
 install: install_ssh_key destroy install_base install_chef_server install_workstation post_message
-install_solo: install_chef install_init install_solo install_chef install_init
+install_solo: install_chef install_init install_solo
 install_workstation: install_keys install_knife
 install_chef_server: install_ssh_key server_destroy prepare_server install_server run_server
 
@@ -74,6 +74,9 @@ install_keys:
 
 install_knife:
 	@-echo -e "\n\e[31m Configuring workstation ...\e[39m\n"
+	mkdir roles
+	ln -s .roles/my.cool.role.json.sample roles/my.cool.role.json.sample
+	ln -s .roles/chef-server.json roles/chef-server.json
 	knife configure -i --admin-client-key=./.chef/keys/admin.pem \
 					   --admin-client-name=admin \
 					   --server-url "https://${CHEF_SERVER_HOSTNAME}" \

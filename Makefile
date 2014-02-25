@@ -66,7 +66,9 @@ ifdef DEB
 endif
 
 ifdef RHEL
+
 ifndef gem
+ifdef rvm
 	@-echo -e "\n\e[31m Ruby 2.1.1 will be compiled.... \e[39m\n"
 	@-rvmsudo rvm get stable --auto-dotfiles
 	@-rvmsudo rvm install ruby-2
@@ -84,6 +86,7 @@ ifndef gem
 	-@echo -e "\e[39m"
 	@exit 1
 endif
+endif
 
 ifndef rvm
 	@-echo -e "\n\e[31m RVM will be installed.... \e[39m\n"
@@ -91,7 +94,7 @@ ifndef rvm
 	-sudo usermod -a -G rvm $(user)
 	-@echo -e "\n \e[33m"
 	-@echo -e "    +-------------------------------------------+"
-	-@echo -e "    |	    RVM is installed!              |"
+	-@echo -e "    |	    RVM is installed!		   |"
 	-@echo -e "    |-------------------------------------------|"
 	-@echo -e "    | Please login and logout from shell to	   |"
 	-@echo -e "    | activate rvm profile. And launch make	   |"
@@ -193,7 +196,7 @@ endif
 	-${SSH} "sudo pkill -f beam"
 	-${SSH} "sudo pkill -f postgres"
 	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /root/chef-solo /usr/bin/chef* /var/opt/chef-server/ /var/chef /var/log/chef-server/ /tmp/hsperfdata_chef_server"
-	-${SSH} "rpm -e `rpm -qa | grep chef-server`"
+	-${SSH} "rpm -e \`rpm -qa | grep chef-server\`"
 
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'

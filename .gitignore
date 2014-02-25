@@ -15,3 +15,4 @@ nodes
 client.rb
 *.pem
 Berksfile
+Gemfile.lock

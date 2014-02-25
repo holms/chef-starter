@@ -8,11 +8,10 @@ SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
 SSH	  	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
 
 rvm  	  := $(shell { type rvm; } 2>/dev/null)
+gem       := $(shell { type gem; } 2>/dev/null)
 user 	  := $(shell { whoami; } )
 sshcopyid := $(shell { type ssh-copy-id; } 2>/dev/null)
 
-rvm  := $(shell { type rvm; } 2>/dev/null)
-user := $(shell { whoami; } )
 
 ports := $(shell { type port; } 2>/dev/null)
 apt   := $(shell { type apt-get; } 2>/dev/null)
@@ -67,20 +66,32 @@ ifdef DEB
 endif
 
 ifdef RHEL
-	@-echo -e "\n\e[31m RVM with Ruby 2.1.1 will be compiled.... \e[39m\n"
-	export rvmsudo_secure_path=1
-ifdef rvm
+ifndef gem
+	@-echo -e "\n\e[31m Ruby 2.1.1 will be compiled.... \e[39m\n"
 	@-rvmsudo rvm get stable --auto-dotfiles
 	@-rvmsudo rvm install ruby-2
 	@-rvmsudo rvm alias create default ruby-2.1.1
+	-@echo -e "\n \e[33m"
+	-@echo -e "    +--------------------------------------------+"
+	-@echo -e "    |	    Ruby is installed!              |"
+	-@echo -e "    |--------------------------------------------|"
+	-@echo -e "    | Please login and logout from shell to	    |"
+	-@echo -e "    | activate ruby env. And launch make install |"
+	-@echo -e "    | command again. Blame rvm devs for this     |"
+	-@echo -e "    +--------------------------------------------+"
+	-@echo -e ""
+	-@echo -e " Exiting..."
+	-@echo -e "\e[39m"
+	@exit 1
 endif
 
 ifndef rvm
+	@-echo -e "\n\e[31m RVM will be installed.... \e[39m\n"
 	-\curl -sSL https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | sudo bash -s stable
 	-sudo usermod -a -G rvm $(user)
 	-@echo -e "\n \e[33m"
 	-@echo -e "    +-------------------------------------------+"
-	-@echo -e "    |	    RVM is installed!                  |"
+	-@echo -e "    |	    RVM is installed!              |"
 	-@echo -e "    |-------------------------------------------|"
 	-@echo -e "    | Please login and logout from shell to	   |"
 	-@echo -e "    | activate rvm profile. And launch make	   |"
@@ -92,18 +103,15 @@ ifndef rvm
 	@exit 1
 endif
 
+
 endif
 
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
 ifdef RHEL
-	rvmsudo gem clean knife-solo
-	rvmsudo gem install --no-ri --no-rdoc knife-solo berkshelf test-kitchen
-	rvmsudo gem update --no-ri --no-rdoc knife-solo berkshelf test-kitchen
+	rvmsudo bundle install
 endif
 ifndef RHEL
-	sudo gem clean knife-solo
-	sudo gem install --no-ri --no-rdoc knife-solo berkshelf test-kitchen
-	sudo gem update --no-ri --no-rdoc knife-solo berkshelf test-kitchen
+	sudo bundle install
 endif
 
 
@@ -137,7 +145,7 @@ install_server:
 
 run_server:
 	@-echo -e "\n\e[31m Starting chef-server ...\e[39m\n"
-	${SSH} "sudo chef-server-ctl start"
+	-${SSH} "sudo chef-server-ctl start"
 
 install_keys:
 	@-echo -e "\n\e[31m Installing chef-server keys to your workstation ...\e[39m\n"
@@ -171,6 +179,8 @@ ifdef $(CHEF_SERVER_HOSTNAME)
 endif
 
 destroy_server:
+	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
+	@-echo -e "Press enter to confirm: "; read confirm
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"
 	-${SSH} "sudo chef-server-ctl uninstall"
 ifeq ($(CHEF_SERVER_OS),debian)
@@ -183,12 +193,13 @@ endif
 	-${SSH} "sudo pkill -f beam"
 	-${SSH} "sudo pkill -f postgres"
 	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /root/chef-solo /usr/bin/chef* /var/opt/chef-server/ /var/chef /var/log/chef-server/ /tmp/hsperfdata_chef_server"
+	-${SSH} "rpm -e `rpm -qa | grep chef-server`"
 
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
 destroy_local:
-	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER AND YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
+	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
 	@-echo -e "Press enter to confirm: "; read confirm
 	-rm -rf .chef
 	-rm -rf Berksfile.lock

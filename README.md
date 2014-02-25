@@ -13,7 +13,7 @@ Also this prolly would be good for initialising new chef repo and setuping works
 Requirements
 ------------
 
-* This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
+* This setup requires a proper FQDN on your chef-server! If you're in intranet, set one in /etc/hosts
 * You required to have public key in your ~/.ssh/ directory. It will be copied to a chef-server node.
 * SUDO enabled unix. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` in your sudoers file or else Makefile will fail
 * Your sudo user must be the same on all the nodes as server machine (propose for better practise in issue)

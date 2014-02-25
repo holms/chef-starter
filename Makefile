@@ -43,14 +43,29 @@ ifdef OSX
 	-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
 	sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
 endif
+
 ifdef DEB
 	sudo apt-get install ruby1.9.3 make -y
 endif
+
 ifdef RHEL
-	-sudo rpm -Uvh http://rbel.frameos.org/rbel6
-	-sudo yum update
-	-sudo yum install -y ruby rubygems ruby-devel ruby-ri ruby-rdoc ruby-shadow gcc gcc-c++ automake autoconf make curl dmidecode
+	@-echo -e "\n\e[31m Ruby 1.9.3-p0 will be compiled, press enter to proceed: \e[39m\n"; read confirm
+	-sudo yum install -y libyaml-devel zlib-devel openssl-devel 
+	-wget -N http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p0.tar.gz
+	-tar xzvf ruby-1.9.3-p0.tar.gz
+	-sudo yum groupinstall -y "Development Tools"
+	cd ruby-1.9.3-p0 ; ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib
+	-cd ruby-1.9.3-p0 ; make ; sudo make install
+	-rm -rf ruby-1.9.3-p0
+	-sudo ln -s /usr/local/bin/ruby /bin/ruby
+	@-echo -e "\n\e[31m Rubygems 1.8.24 will be compiled, press enter to proceed: \e[39m\n"; read confirm
+	-wget -N http://rubyforge.org/frs/download.php/76073/rubygems-1.8.24.tgz
+	-tar xvzf rubygems-1.8.24.tgz 
+	-cd rubygems-1.8.24 ; sudo ruby setup.rb 
+	-sudo ln -s /usr/local/bin/gem /bin/gem
+	-sudo gem update --system
 endif
+
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
 	sudo gem install --no-ri --no-rdoc knife-solo berkshelf
 	sudo gem update --no-ri --no-rdoc knife-solo berkshelf

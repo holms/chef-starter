@@ -2,13 +2,23 @@
 # TODO:
 # 	* Passwordless sudo supported only
 
--include .makerc
-UNAME := $(shell uname)
+-include .makercd
 
-ifeq ($(UNAME),Darwin)
-	SHELL := /opt/local/bin/bash
-else
-	SHELL := /bin/bash
+ports := $(shell { type port; } 2>/dev/null)
+apt   := $(shell { type apt-get; } 2>/dev/null)
+yum   := $(shell { type yum; } 2>/dev/null)
+
+ifdef ports
+	SHELL := /opt/local/bin/bash  # must be installed from macports, or else bash colors won't work
+	OSX   := true
+endif
+
+ifdef apt
+	DEB   := true
+endif
+
+ifdef yum
+	RHEL  := true
 endif
 
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
@@ -27,13 +37,19 @@ install_ssh_key:
 
 install_chef:
 	@-echo -e "\n\e[31m Installing ruby and make packages ...\e[39m\n"
-ifeq ($(UNAME),Darwin)
-		sudo port -v install ruby19 +nosuffiix
-		sudo port -v install gmake
-		-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
-		sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
-else
-		sudo apt-get install ruby1.9.3 make -y
+ifdef OSX
+	sudo port -v install ruby19 +nosuffiix
+	sudo port -v install gmake
+	-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
+	sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
+endif
+ifdef DEB
+	sudo apt-get install ruby1.9.3 make -y
+endif
+ifdef RHEL
+	-sudo rpm -Uvh http://rbel.frameos.org/rbel6
+	-sudo yum update
+	-sudo yum install -y ruby rubygems ruby-devel ruby-ri ruby-rdoc ruby-shadow gcc gcc-c++ automake autoconf make curl dmidecode
 endif
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
 	sudo gem install --no-ri --no-rdoc knife-solo berkshelf

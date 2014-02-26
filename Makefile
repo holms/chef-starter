@@ -36,11 +36,13 @@ endif
 
 
 all: update
-
-install: install_ssh_key destroy install_solo install_chef_server install_workstation post_message
-install_solo: install_chef install_init install_solo
 install_workstation: install_keys install_knife
-install_chef_server: install_ssh_key server_destroy prepare_server install_server run_server
+install_chef_server: install_ssh_key destroy_server prepare_server install_server run_server
+
+install_solo: destroy_local install_chef install_init install_solo
+install: install_solo install_chef_server install_workstation post_message
+
+
 
 install_ssh_key:
 ifndef sshcopyid
@@ -168,7 +170,7 @@ ifdef $(CHEF_SERVER_HOSTNAME)
 	knife upload roles /roles/*.json
 endif
 
-server_destroy:
+destroy_server:
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"
 	-${SSH} "sudo chef-server-ctl uninstall"
 ifeq ($(CHEF_SERVER_OS),debian)
@@ -185,7 +187,7 @@ endif
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
-destroy:
+destroy_local:
 	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER AND YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
 	@-echo -e "Press enter to confirm: "; read confirm
 	-rm -rf .chef

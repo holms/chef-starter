@@ -1,8 +1,11 @@
 
 # TODO:
-# 	* Passwordless sudo supported only
+#	* Passwordless sudo supported only
 
 -include .makercd
+
+rvm  := $(shell { type rvm; } 2>/dev/null)
+user := $(shell { whoami; } )
 
 ports := $(shell { type port; } 2>/dev/null)
 apt   := $(shell { type apt-get; } 2>/dev/null)
@@ -49,26 +52,45 @@ ifdef DEB
 endif
 
 ifdef RHEL
-	@-echo -e "\n\e[31m Ruby 1.9.3-p0 will be compiled, press enter to proceed: \e[39m\n"; read confirm
-	-sudo yum install -y libyaml-devel zlib-devel openssl-devel 
-	-wget -N http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p0.tar.gz
-	-tar xzvf ruby-1.9.3-p0.tar.gz
-	-sudo yum groupinstall -y "Development Tools"
-	cd ruby-1.9.3-p0 ; ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib
-	-cd ruby-1.9.3-p0 ; make ; sudo make install
-	-rm -rf ruby-1.9.3-p0
-	-sudo ln -s /usr/local/bin/ruby /bin/ruby
-	@-echo -e "\n\e[31m Rubygems 1.8.24 will be compiled, press enter to proceed: \e[39m\n"; read confirm
-	-wget -N http://rubyforge.org/frs/download.php/76073/rubygems-1.8.24.tgz
-	-tar xvzf rubygems-1.8.24.tgz 
-	-cd rubygems-1.8.24 ; sudo ruby setup.rb 
-	-sudo ln -s /usr/local/bin/gem /bin/gem
-	-sudo gem update --system
+	@-echo -e "\n\e[31m RVM with Ruby 2.1.1 will be compiled, press enter to proceed: \e[39m\n"; read confirm
+
+ifdef rvm
+	-rvmsudo rvm get stable --auto-dotfiles
+	-rvmsudo rvm install ruby-2
+	-rvmsudo rvm alias create default ruby-2.1.1
+
+endif
+
+ifndef rvm
+	-\curl -sSL https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | sudo bash -s stable
+	sudo usermod -a -G rvm $(user)
+	-@echo -e "\n \e[33m"
+	-@echo -e "    +-------------------------------------------+"
+	-@echo -e "    |	    RVM is installed!		   |"
+	-@echo -e "    |-------------------------------------------|"
+	-@echo -e "    | Please login and logout from shell to	   |"
+	-@echo -e "    | activate rvm profile. And launch make	   |"
+	-@echo -e "    | intall command again			   |"
+	-@echo -e "    +-------------------------------------------+"
+	-@echo -e ""
+	-@echo -e " Exiting..."
+	-@echo -e "\e[39m"
+	@exit 1
+endif
+	
 endif
 
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
+ifdef RHEL
+	rvmsudo gem install --no-ri --no-rdoc knife-solo berkshelf
+	rvmsudo gem update --no-ri --no-rdoc knife-solo berkshelf
+endif
+ifndef RHEL
 	sudo gem install --no-ri --no-rdoc knife-solo berkshelf
 	sudo gem update --no-ri --no-rdoc knife-solo berkshelf
+endif
+
+
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"

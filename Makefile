@@ -121,6 +121,7 @@ endif
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
+	-berks vendor ./cookbooks
 	@-if [ ! -f Berksfile ] ; \
 	then \
 	   cp Berksfile.sample Berksfile; \
@@ -171,7 +172,6 @@ install_knife:
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	-rm -rf Berksfile.lock
-	berks vendor ./cookbooks
 ifdef $(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife upload cookbooks /cookbooks

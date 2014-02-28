@@ -1,43 +1,123 @@
 
 # TODO:
-# 	* Passwordless sudo supported only
+#	* Passwordless sudo supported only
 
 -include .makerc
-UNAME := $(shell uname)
-
-ifeq ($(UNAME),Darwin)
-	SHELL := /opt/local/bin/bash
-else
-	SHELL := /bin/bash
-endif
 
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
-SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
+SSH	  	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
+
+rvm  	  := $(shell { type rvm; } 2>/dev/null)
+gem       := $(shell { type gem; } 2>/dev/null)
+user 	  := $(shell { whoami; } )
+sshcopyid := $(shell { type ssh-copy-id; } 2>/dev/null)
+
+
+ports := $(shell { type port; } 2>/dev/null)
+apt   := $(shell { type apt-get; } 2>/dev/null)
+yum   := $(shell { type yum; } 2>/dev/null)
+
+# OSX SUPPORT
+ifdef ports
+	SHELL := /opt/local/bin/bash  # must be installed from macports, or else bash colors won't work
+	OSX   := true
+endif
+
+# DEBIAN/UBUNTU SUPPORT
+ifdef apt
+	DEB   := true
+endif
+
+# RHEL SUPPORT
+ifdef yum
+	RHEL  := true
+endif
+
 
 all: update
-
-install: install_ssh_key destroy install_base install_chef_server install_workstation post_message
-install_solo: install_chef install_init install_solo
 install_workstation: install_keys install_knife
-install_chef_server: install_ssh_key server_destroy prepare_server install_server run_server
+install_chef_server: install_ssh_key destroy_server prepare_server install_server run_server
+
+install_solo: destroy_local install_chef install_init install_solo
+install: install_solo install_chef_server install_workstation post_message
+
+
 
 install_ssh_key:
+ifndef sshcopyid
+	sudo scp -r ${SSH_CREDS}:/usr/bin/ssh-copy-id /usr/bin
+	sudo chmod +x /usr/bin/ssh-copy-id
+endif
 	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
-	ssh-copy-id ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
+	ssh-copy-id ${SSH_CREDS}
 
 install_chef:
 	@-echo -e "\n\e[31m Installing ruby and make packages ...\e[39m\n"
-ifeq ($(UNAME),Darwin)
-		sudo port -v install ruby19 +nosuffiix
-		sudo port -v install gmake
-		-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
-		sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
-else
-		sudo apt-get install ruby1.9.3 make -y
+
+ifdef OSX
+	sudo port -v install ruby19 +nosuffiix
+	sudo port -v install gmake
+	-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
+	sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
 endif
+
+ifdef DEB
+	sudo apt-get install ruby1.9.3 make -y
+endif
+
+ifdef RHEL
+
+ifndef gem
+ifdef rvm
+	@-echo -e "\n\e[31m Ruby 2.1.1 will be compiled.... \e[39m\n"
+	@-rvmsudo rvm get stable --auto-dotfiles
+	@-rvmsudo rvm install ruby-2
+	@-rvmsudo rvm alias create default ruby-2.1.1
+	-@echo -e "\n \e[33m"
+	-@echo -e "    +--------------------------------------------+"
+	-@echo -e "    |	    Ruby is installed!              |"
+	-@echo -e "    |--------------------------------------------|"
+	-@echo -e "    | Please login and logout from shell to	    |"
+	-@echo -e "    | activate ruby env. And launch make install |"
+	-@echo -e "    | command again. Blame rvm devs for this     |"
+	-@echo -e "    +--------------------------------------------+"
+	-@echo -e ""
+	-@echo -e " Exiting..."
+	-@echo -e "\e[39m"
+	@exit 1
+endif
+endif
+
+ifndef rvm
+	@-echo -e "\n\e[31m RVM will be installed.... \e[39m\n"
+	-\curl -sSL https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | sudo bash -s stable
+	-sudo usermod -a -G rvm $(user)
+	-@echo -e "\n \e[33m"
+	-@echo -e "    +-------------------------------------------+"
+	-@echo -e "    |	    RVM is installed!		   |"
+	-@echo -e "    |-------------------------------------------|"
+	-@echo -e "    | Please login and logout from shell to	   |"
+	-@echo -e "    | activate rvm profile. And launch make	   |"
+	-@echo -e "    | intall command again                      |"
+	-@echo -e "    +-------------------------------------------+"
+	-@echo -e ""
+	-@echo -e " Exiting..."
+	-@echo -e "\e[39m"
+	@exit 1
+endif
+
+
+endif
+
 	@-echo -e "\n\e[31m Installing knife-solo and berkshelf gems ...\e[39m\n"
-	sudo gem install --no-ri --no-rdoc knife-solo berkshelf
-	sudo gem update --no-ri --no-rdoc knife-solo berkshelf
+ifdef RHEL
+	rvmsudo bundle install
+endif
+ifndef RHEL
+	sudo bundle install
+endif
+
+
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
@@ -56,16 +136,19 @@ endif
 
 install_server:
 	@-echo -e "\n\e[31m Copying chef-server node template as node config ...\e[39m\n"
-	mkdir nodes
-	ln -s .nodes/chef.server.json.sample nodes/${CHEF_SERVER_HOSTNAME}.json
+	-mkdir nodes
+	-cd nodes ; ln -s ../.nodes/chef.server.json ${CHEF_SERVER_HOSTNAME}.json
+	-mkdir roles
+	-cd roles ; ln -s ../.roles/my.cool.role.json.sample my.cool.role.json.sample
+	-cd roles ; ln -s ../.roles/chef-server.json chef-server.json
 	@-echo -e "\n\e[31m Bootstraping chef-server ...\e[39m\n"
-	knife solo prepare $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
+	knife solo prepare $(SSH_CREDS)
 	@-echo -e "\n\e[31m Cooking chef-server ...\e[39m\n"
-	knife solo cook $(CHEF_SERVER_USERNAME)@$(CHEF_SERVER_HOSTNAME)
+	knife solo cook $(SSH_CREDS)
 
 run_server:
 	@-echo -e "\n\e[31m Starting chef-server ...\e[39m\n"
-	${SSH} "sudo chef-server-ctl start"
+	-${SSH} "sudo chef-server-ctl start"
 
 install_keys:
 	@-echo -e "\n\e[31m Installing chef-server keys to your workstation ...\e[39m\n"
@@ -74,9 +157,6 @@ install_keys:
 
 install_knife:
 	@-echo -e "\n\e[31m Configuring workstation ...\e[39m\n"
-	mkdir roles
-	ln -s .roles/my.cool.role.json.sample roles/my.cool.role.json.sample
-	ln -s .roles/chef-server.json roles/chef-server.json
 	knife configure -i --admin-client-key=./.chef/keys/admin.pem \
 					   --admin-client-name=admin \
 					   --server-url "https://${CHEF_SERVER_HOSTNAME}" \
@@ -91,7 +171,7 @@ install_knife:
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	-rm -rf Berksfile.lock
-	berks install --path ./cookbooks
+	berks vendor ./cookbooks
 ifdef $(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife upload cookbooks /cookbooks
@@ -101,7 +181,9 @@ ifdef $(CHEF_SERVER_HOSTNAME)
 	knife upload roles /roles/*.json
 endif
 
-server_destroy:
+destroy_server:
+	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
+	@-echo -e "Press enter to confirm: "; read confirm
 	@-echo -e "\n\e[31m Unistalling chef-server ...\e[39m\n"
 	-${SSH} "sudo chef-server-ctl uninstall"
 ifeq ($(CHEF_SERVER_OS),debian)
@@ -114,20 +196,24 @@ endif
 	-${SSH} "sudo pkill -f beam"
 	-${SSH} "sudo pkill -f postgres"
 	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /root/chef-solo /usr/bin/chef* /var/opt/chef-server/ /var/chef /var/log/chef-server/ /tmp/hsperfdata_chef_server"
+	-${SSH} "rpm -e \`rpm -qa | grep chef-server\`"
 
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'
 
-destroy:
-	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY CHEF-SERVER AND YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
+destroy_local:
+	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
 	@-echo -e "Press enter to confirm: "; read confirm
 	-rm -rf .chef
 	-rm -rf Berksfile.lock
 	-rm -rf cookbooks
+	-rm -rf nodes
+	-rm -rf roles
 	-rm -rf data_bags
 	-rm -rf environments
 	-rm -rf site-cookbooks
 	-rm -rf tmp
+
 
 post_message:
 

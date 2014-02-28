@@ -15,13 +15,28 @@ Requirements
 
 * This setup requires a proper FQDN. If you're in intranet, set one in /etc/hosts
 * You required to have public key in your ~/.ssh/ directory. It will be copied to a chef-server node.
-* SUDO enabled linux. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` or else Makefile will fail
+* SUDO enabled unix. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` in your sudoers file or else Makefile will fail
 * Your sudo user must be the same on all the nodes as server machine (propose for better practise in issue)
+
+Debian/Ubuntu support:
+----------------------
+
+Should work out of the box.
 
 OSX support:
 ------------
+
     * Install macports
-    * Install bash via macports
+    * Install bash via macports(Default bash won't work)
+
+Currently there's no support for homebrew, feel free to contribute.
+
+RHEL support:
+-------------
+
+System-wide RVM will be installed and ruby will be compiled. If RVM already exists, then ruby will and rubygems will be upgraded. Currently ```ruby2``` is used.
+
+After you run ```make install``` and ```rvm``` will be installed, you'll have to log-out and log-in to shell again. This is due to environment variables, a requirement from ```rvm```
 
 Configure
 ---------
@@ -86,7 +101,7 @@ BUG: Knife-configure problems
 -----------------------------
 
 Update: not sure about this method anymore. When I set all the paths, using ```knife bootstrap```, it stops seeing
-        his keys, and chef-client crashses. So don't perform this step if you want to have working knife after server 
+        his keys, and chef-client crashses. So don't perform this step if you want to have working knife after server
         installation
 
 If you want to use knife-solo together with knife, you need to append knife-solo generated config to knife.rb

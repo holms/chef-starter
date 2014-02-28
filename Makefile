@@ -11,6 +11,9 @@ rvm  	  := $(shell { type rvm; } 2>/dev/null)
 user 	  := $(shell { whoami; } )
 sshcopyid := $(shell { type ssh-copy-id; } 2>/dev/null)
 
+rvm  := $(shell { type rvm; } 2>/dev/null)
+user := $(shell { whoami; } )
+
 ports := $(shell { type port; } 2>/dev/null)
 apt   := $(shell { type apt-get; } 2>/dev/null)
 yum   := $(shell { type yum; } 2>/dev/null)
@@ -68,7 +71,6 @@ ifdef rvm
 	@-rvmsudo rvm get stable --auto-dotfiles
 	@-rvmsudo rvm install ruby-2
 	@-rvmsudo rvm alias create default ruby-2.1.1
-
 endif
 
 ifndef rvm

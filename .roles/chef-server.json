@@ -6,7 +6,7 @@
   "default_attributes": {
     "chef-server": {
       "version": "latest",
-      "package-options": "--replacefiles",
+      "package-options": "--replacepkgs",
       "configuration": {
         "chef_server_webui": {
           "enable": true

@@ -57,7 +57,7 @@ install_chef:
 
 ifdef OSX
 	sudo port -v install ruby19 +nosuffiix
-	sudo port -v install gmake
+	sudo port -v install gmake rb19-bundler
 	-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
 	sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
 endif

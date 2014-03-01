@@ -39,17 +39,21 @@ all: update
 install_workstation: install_keys install_knife
 install_chef_server: install_ssh_key destroy_server prepare_server install_server run_server
 
-install_solo: destroy_local install_chef install_init install_solo
+install_solo: checks destroy_local install_chef install_init install_solo
 install: install_solo install_chef_server install_workstation post_message
 
-
+checks:
+ifeq ("$(wildcard ./.makerc)", "")
+	@echo -e "\n\e[31m .makerc IS NOT FOUND! Please copy .makerc.example to .makerc and edit it! \e[39m\n"
+	@exit 1
+endif
 
 install_ssh_key:
 ifndef sshcopyid
 	sudo scp -r ${SSH_CREDS}:/usr/bin/ssh-copy-id /usr/bin
 	sudo chmod +x /usr/bin/ssh-copy-id
 endif
-	@-echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
+	@echo -e "\n\e[31m Copying your public ssh key to chef-server ...\e[39m\n"
 	ssh-copy-id ${SSH_CREDS}
 
 install_chef:

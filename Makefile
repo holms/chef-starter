@@ -68,7 +68,7 @@ endif
 
 ifdef DEB
 	sudo apt-get install ruby1.9.3 make  -y
-	sudo gem install bundler
+	sudo gem install --no-ri --no-rdoc bundler
 endif
 
 ifdef RHEL

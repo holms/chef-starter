@@ -5,7 +5,8 @@
 -include .makerc
 
 SSH_CREDS := ${CHEF_SERVER_USERNAME}@${CHEF_SERVER_HOSTNAME}
-SSH	  	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
+SSH	  := ssh -t -o StrictHostKeyChecking=no ${SSH_CREDS}
+SHELL	  := /bin/bash 
 
 rvm  	  := $(shell { type rvm; } 2>/dev/null)
 gem       := $(shell { type gem; } 2>/dev/null)
@@ -62,7 +63,8 @@ ifdef OSX
 endif
 
 ifdef DEB
-	sudo apt-get install ruby1.9.3 make -y
+	sudo apt-get install ruby1.9.3 make  -y
+	sudo gem install bundler
 endif
 
 ifdef RHEL

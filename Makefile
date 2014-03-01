@@ -123,8 +123,6 @@ ifndef RHEL
 	sudo bundle install
 endif
 
-
-
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
 	-berks vendor ./cookbooks

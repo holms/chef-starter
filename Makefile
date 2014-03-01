@@ -196,13 +196,12 @@ ifeq ($(CHEF_SERVER_OS),debian)
 	-${SSH} "sudo dpkg -P chef-server; sudo apt-get autoremove -y; sudo apt-get purge -y"
 endif
 ifeq ($(CHEF_SERVER_OS),rhel)
-	-${SSH} "sudo rpm -ev \`rpm -q chef\`"
+	-${SSH} "sudo rpm -e \`rpm -qa | grep chef-server\`"
 endif
 	-${SSH} "sudo pkill -f /opt/chef"
 	-${SSH} "sudo pkill -f beam"
 	-${SSH} "sudo pkill -f postgres"
 	-${SSH} "sudo rm -rf /etc/chef-server /etc/chef /opt/chef-server /opt/chef /root/.chef /root/chef-solo /usr/bin/chef* /var/opt/chef-server/ /var/chef /var/log/chef-server/ /tmp/hsperfdata_chef_server"
-	-${SSH} "rpm -e \`rpm -qa | grep chef-server\`"
 
 server_debug:
 	-${SSH} 'sudo cat /var/chef/cache/chef-stacktrace.out'

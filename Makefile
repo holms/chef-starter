@@ -39,8 +39,8 @@ all: update
 install_workstation: install_keys install_knife
 install_chef_server: install_ssh_key destroy_server prepare_server install_server run_server
 
-install_solo: checks destroy_local install_chef install_init install_solo
-install: install_solo install_chef_server install_workstation post_message
+install_solo: destroy_local install_chef install_init install_solo
+install: checks install_solo install_chef_server install_workstation post_message
 
 checks:
 ifeq ("$(wildcard ./.makerc)", "")

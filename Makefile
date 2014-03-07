@@ -176,6 +176,7 @@ install_knife:
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	-rm -rf Berksfile.lock
+	-berks install
 ifdef $(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
 	knife upload cookbooks /cookbooks

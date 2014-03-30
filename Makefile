@@ -174,15 +174,17 @@ install_knife:
 
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
-	-rm -rf Berksfile.lock
+	-rm -rf roles/Berksfile.lock
 	-cd repo ; berks install
-ifdef $(CHEF_SERVER_HOSTNAME)
+ifdef CHEF_SERVER_HOSTNAME
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
-	cd repo ; knife upload cookbooks /cookbooks
+	cd repo ; berks upload --ssl-verify=false
+	#cd repo ; knife upload cookbooks /cookbooks
+	#cd repo ; knife upload cookbooks /site-cookbooks
 	cd repo ; knife upload environments /environments/*.json
 	@-echo -e "\n\e[33m **** Nodes update depricated and it destroys node state, other cookbook may fail because of this  *****\e[39m\n"
 	#knife upload nodes /nodes/*.json
-	cd repo ;  knife upload roles /roles/*.json
+	cd repo ; knife upload roles /roles/*.json
 endif
 
 destroy_server:
@@ -229,7 +231,7 @@ node_%:
 cook:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "
 	@-echo -e "\e[33m "
-	@-knife node list
+	@-cd repo ; knife node list
 	@-echo -e "\e[39m"
 	@-echo "Node FQDN: "; read node_fqdn; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
@@ -239,7 +241,7 @@ node:
 	@-echo "New node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mCopying node template to $$node_fqdn.json ...\e[39m"; \
 	cp repo/nodes/my.cool.hostname.json.sample repo/nodes/$$node_fqdn.json; \
-	sed -i 's/  \"name\": \"\",/  \"name\": \"'$$node_fqdn'\",/g' nodes/$$node_fqdn.json; \
+	sed -i 's/  \"name\": \"\",/  \"name\": \"'$$node_fqdn'\",/g' repo/nodes/$$node_fqdn.json; \
 	vim repo/nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying your public keys to node ...\n\e[39m"; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn ; \

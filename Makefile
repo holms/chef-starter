@@ -225,7 +225,7 @@ nodes := $(patsubst nodes/%.json,node_%,$(nodes))
 .PHONY: cook-all
 cook-all : $(nodes)
 node_%:
-	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client run"
+	ssh -t ${CHEF_NODE_USERNAME}@$* "sudo chef-client"
 
 .PHONY: cook
 cook:
@@ -234,7 +234,7 @@ cook:
 	@-cd repo ; knife node list
 	@-echo -e "\e[39m"
 	@-echo "Node FQDN: "; read node_fqdn; \
-	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client run"
+	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "sudo chef-client"
 
 .PHONY: node
 node:

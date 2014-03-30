@@ -8,6 +8,8 @@ source "http://api.berkshelf.com"
 #cookbook 'swap',
 #    git: 'https://github.com/sethvargo-cookbooks/swap'
 
-cookbook 'chef-server', git: 'https://github.com/holms/chef-server.git', branch: 'COOK-4386'
+cookbook 'git'
+cookbook 'ntp'
+cookbook 'chef-server'
 cookbook 'chef-client'
 

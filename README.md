@@ -16,7 +16,6 @@ Requirements
 If you won't follow these requirements, Makefile will fail.
 
 * Proper FQDN on your chef-server! If you're in intranet, set one in /etc/hosts
-* Synchronize clock with NTP on your client and server!
 * You required to have public key in your ~/.ssh/ directory. It will be copied to a chef-server node.
 * SUDO enabled unix. Notice: For cloud users: Don't forget to comment ```#Default requiretty``` in your sudoers file or else Makefile will fail
 * Your sudo user must be the same on all the nodes as server machine (propose for better practise in issue)

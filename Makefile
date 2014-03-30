@@ -39,7 +39,7 @@ all: update
 install_workstation: install_keys install_knife
 install_chef_server: install_ssh_key destroy_server prepare_server install_server run_server
 
-install_solo: destroy_local install_chef install_init install_solo
+install_solo: destroy_local install_chef install_init
 install: checks install_solo install_chef_server install_workstation post_message
 
 checks:
@@ -100,7 +100,7 @@ ifndef rvm
 	-sudo usermod -a -G rvm $(user)
 	-@echo -e "\n \e[33m"
 	-@echo -e "    +-------------------------------------------+"
-	-@echo -e "    |	    RVM is installed!		   |"
+	-@echo -e "    |	    RVM is installed!                  |"
 	-@echo -e "    |-------------------------------------------|"
 	-@echo -e "    | Please login and logout from shell to	   |"
 	-@echo -e "    | activate rvm profile. And launch make	   |"
@@ -125,13 +125,14 @@ endif
 
 install_init:
 	@-echo -e "\n\e[31m Initializing chef repository ...\e[39m\n"
-	-berks vendor ./cookbooks
+	knife solo init repo
 	@-if [ ! -f Berksfile ] ; \
 	then \
-	   cp Berksfile.sample Berksfile; \
+	   cp Berksfile.sample repo/Berksfile; \
 	fi;
-	knife solo init .
-	-mkdir -p .chef/keys
+	-rm -rf repo/cookbooks
+	-cd repo ; berks vendor cookbooks
+	-mkdir -p repo/.chef/keys
 
 prepare_server:
 ifneq ($(CHEF_SERVER_USERNAME),root)
@@ -141,15 +142,13 @@ endif
 
 install_server:
 	@-echo -e "\n\e[31m Copying chef-server node template as node config ...\e[39m\n"
-	-mkdir nodes
-	-cd nodes ; ln -s ../.nodes/chef.server.json ${CHEF_SERVER_HOSTNAME}.json
-	-mkdir roles
-	-cd roles ; ln -s ../.roles/my.cool.role.json.sample my.cool.role.json.sample
-	-cd roles ; ln -s ../.roles/chef-server.json chef-server.json
+	-cd repo/nodes ; cp ../../.nodes/chef.server.json ${CHEF_SERVER_HOSTNAME}.json
+	-cd repo/roles ; cp ../../.roles/my.cool.role.json.sample my.cool.role.json.sample
+	-cd repo/roles ; cp ../../.roles/chef-server.json chef-server.json
 	@-echo -e "\n\e[31m Bootstraping chef-server ...\e[39m\n"
-	knife solo prepare $(SSH_CREDS)
+	cd repo ; knife solo prepare $(SSH_CREDS)
 	@-echo -e "\n\e[31m Cooking chef-server ...\e[39m\n"
-	knife solo cook $(SSH_CREDS)
+	cd repo ; knife solo cook $(SSH_CREDS)
 
 run_server:
 	@-echo -e "\n\e[31m Starting chef-server ...\e[39m\n"
@@ -158,11 +157,11 @@ run_server:
 install_keys:
 	@-echo -e "\n\e[31m Installing chef-server keys to your workstation ...\e[39m\n"
 	${SSH} "sudo chown -R ${CHEF_SERVER_USERNAME} /etc/chef-server/*.pem"
-	scp ${SSH_CREDS}:/etc/chef-server/*.pem .chef/keys/
+	scp ${SSH_CREDS}:/etc/chef-server/*.pem repo/.chef/keys/
 
 install_knife:
 	@-echo -e "\n\e[31m Configuring workstation ...\e[39m\n"
-	knife configure -i --admin-client-key=./.chef/keys/admin.pem \
+	cd repo ; knife configure -i --admin-client-key=./.chef/keys/admin.pem \
 					   --admin-client-name=admin \
 					   --server-url "https://${CHEF_SERVER_HOSTNAME}" \
 					   --editor vim \
@@ -171,19 +170,19 @@ install_knife:
 					   --validation-client-name=chef-validator \
 					   --validation-key=./.chef/keys/chef-validator.pem \
 					   --print-after -y
-	knife configure client .chef/
+	cd repo ; knife configure client .chef/
 
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
 	-rm -rf Berksfile.lock
-	-berks install
+	-cd repo ; berks install
 ifdef $(CHEF_SERVER_HOSTNAME)
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
-	knife upload cookbooks /cookbooks
-	knife upload environments /environments/*.json
+	cd repo ; knife upload cookbooks /cookbooks
+	cd repo ; knife upload environments /environments/*.json
 	@-echo -e "\n\e[33m **** Nodes update depricated and it destroys node state, other cookbook may fail because of this  *****\e[39m\n"
 	#knife upload nodes /nodes/*.json
-	knife upload roles /roles/*.json
+	cd repo ;  knife upload roles /roles/*.json
 endif
 
 destroy_server:
@@ -208,18 +207,15 @@ server_debug:
 destroy_local:
 	@-echo -e "\n\e[31m\e[5m WARNING! \e[25m\e[31m THIS WILL DESTROY YOUR WORKSTATION CONFIGURATION, DO YOU REALLY WANT TO PROCESEED???!!111 IF NO - PRESS CTRL+C \e[39m\n"
 	@-echo -e "Press enter to confirm: "; read confirm
+	-rm -rf repo
 	-rm -rf .chef
+	-rm -rf Berksfile
 	-rm -rf Berksfile.lock
-	-rm -rf cookbooks
-	-rm -rf nodes
-	-rm -rf roles
-	-rm -rf data_bags
-	-rm -rf environments
-	-rm -rf site-cookbooks
 	-rm -rf tmp
 
 
 post_message:
+	@-echo -e "\n\e[31m We done! \e[39m\n"
 
 nodes := $(filter-out $(wildcard nodes/*$(CHEF_SERVER_HOSTNAME)* nodes/*.sample*   ),$(wildcard nodes/* ))
 nodes := $(patsubst nodes/%.json,node_%,$(nodes))
@@ -242,19 +238,19 @@ cook:
 node:
 	@-echo "New node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mCopying node template to $$node_fqdn.json ...\e[39m"; \
-	cp nodes/my.cool.hostname.json.sample nodes/$$node_fqdn.json; \
+	cp repo/nodes/my.cool.hostname.json.sample repo/nodes/$$node_fqdn.json; \
 	sed -i 's/  \"name\": \"\",/  \"name\": \"'$$node_fqdn'\",/g' nodes/$$node_fqdn.json; \
-	vim nodes/$$node_fqdn.json; \
+	vim repo/nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying your public keys to node ...\n\e[39m"; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn ; \
 	echo -e "\n\e[31mAdding $$node_fqdn to chef server ...\n\e[39m"; \
-	knife upload /nodes/$$node_fqdn.json ; \
-	knife node from file nodes/$$node_fqdn.json; \
+	cd repo ; knife upload nodes/$$node_fqdn.json ; \
+	cd repo ; knife node from file nodes/$$node_fqdn.json; \
 	echo -e "\n\e[31mCopying validation.pem and client.rb to node /etc/chef ...\n\e[39m"; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn "mkdir -p ~/.chef" ; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn ...\n\e[39m"; \
-	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo; \
-	knife upload /nodes/$$node_fqdn.json
+	cd repo ; knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo; \
+	cd repo ; knife upload /nodes/$$node_fqdn.json
 
 rebootstrap:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "
@@ -263,12 +259,12 @@ rebootstrap:
 	@-echo -e "\e[39m "
 	@-echo "Enter node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mRemoving chef-client from  $$node_fqdn.json ...\e[39m"; \
-	knife node delete $$node_fqdn; \
-	knife client delete $$node_fqdn; \
+	cd repo ; knife node delete $$node_fqdn; \
+	cd repo ; knife client delete $$node_fqdn; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
-	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
+	cd repo ; knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \
-	knife upload /nodes/$$node_fqdn.json
+	cd repo ; knife upload /nodes/$$node_fqdn.json
 

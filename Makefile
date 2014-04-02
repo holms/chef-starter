@@ -60,11 +60,9 @@ install_chef:
 	@-echo -e "\n\e[31m Installing ruby and make packages ...\e[39m\n"
 
 ifdef OSX
-	sudo port -v install ruby19
+	sudo port -v install ruby19 +nosuffix
+	-sudo ln -s /opt/local/bin/gem1.9 /opt/local/bin/gem
 	sudo port -v install gmake rb19-bundler
-	-sudo ln -s /opt/local/bin/bundle-1.9 /opt/local/bin/bundle
-	-sudo mv /opt/local/bin/ruby /opt/local/bin/ruby20
-	sudo ln -s /opt/local/bin/ruby1.9 /opt/local/bin/ruby
 endif
 
 ifdef DEB

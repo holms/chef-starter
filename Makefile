@@ -61,8 +61,11 @@ install_chef:
 
 ifdef OSX
 	sudo port -v install ruby19 +nosuffix
-	-sudo ln -s /opt/local/bin/gem1.9 /opt/local/bin/gem
+	sudo port select --set ruby ruby19
 	sudo port -v install gmake rb19-bundler
+	-sudo ln -s /opt/local/bin/gem-1.9 /opt/local/bin/gem
+	-sudo ln -s /opt/local/bin/irb-1.9 /opt/local/bin/irb
+	-sudo ln -s /opt/local/bin/bundle-1.9 /opt/local/bin/bundle
 endif
 
 ifdef DEB

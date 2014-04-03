@@ -35,6 +35,14 @@ OSX support:
 
 Currently there's no support for homebrew, feel free to contribute.
 
+BUG: there's a strange problem which occurs on my iMac, but never happens on macbook air, with totally indentical version of software. If knife command won't be found when you launched Makefile, add this to your ```~/.profile```
+
+```
+export GEM_HOME="/opt/local/lib/ruby1.9/gems/1.9.1/"
+export GEM_PATH="/opt/local/lib/ruby1.9/gems/1.9.1/"
+export PATH=/opt/local/lib/ruby1.9/gems/1.9.1/bin:$PATH
+```
+
 RHEL support:
 -------------
 

@@ -176,11 +176,14 @@ install_knife:
 
 update:
 	@-echo -e "\n\e[31m Installing cookbooks depedencies ...\e[39m\n"
-	-rm -rf roles/Berksfile.lock
+	-rm -rf repo/Berksfile.lock
 	-cd repo ; berks install
 ifdef CHEF_SERVER_HOSTNAME
 	@-echo -e "\n\e[31m Uploading all cookbooks to chef server...\e[39m\n"
-	cd repo ; berks upload --ssl-verify=false
+	rm -rf repo/cookbooks
+	cd repo ; berks vendor cookbooks
+	cd repo ; knife cookbook upload -a --force -o  cookbooks/
+	#cd repo ; berks upload --ssl-verify=false
 	#cd repo ; knife upload cookbooks /cookbooks
 	#cd repo ; knife upload cookbooks /site-cookbooks
 	cd repo ; knife upload environments /environments/*.json
@@ -259,16 +262,16 @@ node:
 rebootstrap:
 	@-echo -e "\n\e[31mHere's a list of your nodes: "
 	@-echo -e "\e[33m "
-	@-knife node list
+	@-cd repo ; knife node list
 	@-echo -e "\e[39m "
 	@-echo "Enter node FQDN: "; read node_fqdn; \
 	echo -e "\n\e[31mRemoving chef-client from  $$node_fqdn.json ...\e[39m"; \
 	cd repo ; knife node delete $$node_fqdn; \
-	cd repo ; knife client delete $$node_fqdn; \
+	knife client delete $$node_fqdn; \
 	ssh-copy-id ${CHEF_NODE_USERNAME}@$$node_fqdn; \
 	ssh -t ${CHEF_NODE_USERNAME}@$$node_fqdn  "sudo rm -rf /etc/chef /var/chef /opt/chef; rm -rf ~/.chef"; \
 	echo -e "\n\e[31mBootstraping $$node_fqdn.json ...\e[39m"; \
-	cd repo ; knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
+	knife bootstrap -x ${CHEF_NODE_USERNAME} $$node_fqdn --sudo;\
 	echo -e "\n\e[31mUploading your node configuration ... \n\e[39m\n"; \
-	cd repo ; knife upload /nodes/$$node_fqdn.json
+	knife upload /nodes/$$node_fqdn.json
 

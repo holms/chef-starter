@@ -145,6 +145,7 @@ endif
 install_server:
 	@-echo -e "\n\e[31m Copying chef-server node template as node config ...\e[39m\n"
 	-cd repo/nodes ; cp ../../.nodes/chef.server.json ${CHEF_SERVER_HOSTNAME}.json
+	-cd repo/nodes ; cp ../../.nodes/my.cool.hostname.json.sample ./
 	-cd repo/roles ; cp ../../.roles/my.cool.role.json.sample my.cool.role.json.sample
 	-cd repo/roles ; cp ../../.roles/chef-server.json chef-server.json
 	@-echo -e "\n\e[31m Bootstraping chef-server ...\e[39m\n"
